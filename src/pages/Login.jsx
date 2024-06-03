@@ -17,11 +17,15 @@ export default function(){
   }
   globalThis.__.Login = (
     <div class='flex justify-center select-none place-items-center h-full w-full overflow-scroll'>
-      <div id='login-form' class='relative z-50 rounded-3xl shadow-black shadow-2xl border-none overflow-clip'>
+       <div class='w-[30vw] z-50'>
+          dasklm,adsmklasd
+        </div>
+      <div id='login-form' class='  w-[30vw] relative z-30 rounded-3xl shadow-black shadow-2xl border-none overflow-clip flex'>
         <Show when={bg()}>
           <div class='top-4 left-4' style='background:linear-gradient(to right,#ff5124,#f09819);'/>
           <div class='bottom-4 right-4' style='background:linear-gradient(#1845ad,#23a2f6);'/>
         </Show>
+        
         <form class='rounded-3xl w-full h-full'>
           <h3>Login Here</h3>
           <label for='username'>Username</label>
