@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#login-form > div {
+  @apply size-60;
+  @apply absolute;
+  @apply rounded-full;
+  animation: fadeIn 6s ease-out;
+  animation-delay: 1s;
+  animation-fill-mode: both;
+}
+@keyframes fadeIn {
+  0% { opacity: 0; };
+  10% {opacity: .25; };
+  100% { opacity: .75; };
+}
+
+#login-form > form{
+  @apply px-16 py-20;
+  @apply max-[360px]:px-10;
+  @apply max-[300px]:px-8;
+  @apply max-[277px]:px-6 max-[360px]:py-16;
+  @apply max-[227px]:px-4 max-[360px]:py-14;
+  @apply max-[197px]:px-1;
+  backdrop-filter: blur(100px);
+}
+
+#login-form > form > label {
+  display: block;
+  @apply mt-6;
+  @apply mb-2;
+  @apply ml-3;
+}
+#login-form > form > input{
+  @apply px-4;
+  @apply py-2;
+  @apply w-full;
+  display: block;
+  background-color: rgba(255,255,255,0.07);
+  @apply rounded-full;
+  @apply mb-4;
+}
+

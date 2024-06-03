@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#sidebar-menu {
+  height: 100%;
+  animation: slideIn .50s ease-in-out;
+  animation-fill-mode: both;
+  transform: rotate(10);
+}
+
+@keyframes slideOut {
+  0% { transform: translateX(0%) }
+  100% { transform: translateX(-100%) }
+}
+@keyframes slideIn {
+  0% { transform: translateX(-100%) }
+  100% { transform: translateX(0%) }
+}
+@keyframes rollUp {
+  100% {
+    left:-0.75rem;
+    top: -1.25rem;
+    border-radius: 100%;
+    transform: rotate(30deg);
+    @apply size-20 bg-blue-950;
+  }
+}
+@keyframes rollOut {
+  0% {
+    left:-0.75rem;
+    top: -1.25rem;
+    border-radius: 100%;
+    transform: rotate(30deg);
+    
+    @apply size-20 bg-blue-950;
+  }
+}
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+
+/* transition={{duration: .75, easing: 'ease-in-out'}}  */
+/* animate={{x: ['-22rem', 0]}} */
+/* exit={{ x: [0, '-22rem'], transition: {duration: .2}}} */
+#sidebar-menu > ul > li {
+  font-size: 1rem;
+}
+
+#sidebar-menu > ul > li > span > span > svg {
+  fill : rgb(160, 198, 254);
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: .75rem;
+  margin-left: .25rem;
+}
+
+#sidebar-menu > ul > li > span {
+  padding: 1vh;
+  @apply rounded-full;
+  cursor: pointer;
+}
+
