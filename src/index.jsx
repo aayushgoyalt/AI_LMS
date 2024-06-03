@@ -25,6 +25,7 @@ render(() => {
   sidebar(true);
   // <div class='max-[715px]:hidden sidebar-menu max-[715px]:w-0 transition-all duration-500' />
   const Anim = x => <Motion class={'h-full' + (bar() ? ' min-[715px]:ml-56' : '')} transition={{ duration: .5, easing: 'ease-in-out' }} animate={{ opacity: [0, 1] }} exit={{ opacity: [1, .25], scale: [1, .65], transition: { duration: 0.2 } }}>{x.children}</Motion>;
+  const Anime = x => <Motion class={'h-full'} transition={{ duration: .5, easing: 'ease-in-out' }} animate={{ opacity: [0, 1] }} exit={{ opacity: [1, .25], scale: [1, .65], transition: { duration: 0.2 } }}>{x.children}</Motion>;
 
   return (
     <>
@@ -33,7 +34,7 @@ render(() => {
         <Presence exitBeforeEnter>
           <Switch>
             <Match when={nav() === 'login'}>
-              <Anim><Login /></Anim>
+              <Anime><Login /></Anime>
             </Match>
             <Match when={nav() === 'profcom'}>
               <Anim><Home /></Anim>
