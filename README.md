@@ -16,7 +16,7 @@ gnu `make` (or run the commands yourself)
 
 ## Usage
 
-install deendencies with
+install dependencies with
 ```bash
 $ bun install
 ```
