@@ -45,6 +45,7 @@ inline fn createUser(db: fs.Dir, username: [:0]const u8, password: [:0]const u8)
   var file = udir.createFile(".password", .{}) catch return error.@"createUser createFile error";
   defer file.close();
   _ = file.write(password) catch return error.@"createUser write error";
+  try stdout.print("User Created");
 }
 
 inline fn deleteUser(db: fs.Dir, username: [:0]const u8) !void {
@@ -54,8 +55,7 @@ inline fn deleteUser(db: fs.Dir, username: [:0]const u8) !void {
 pub fn main() !void{
   var buffer: [4 << 10]u8 = undefined;
   const DB = try fs.cwd().openDir("db", .{});
-  var Allocator = std.heap.FixedBufferAllocator.init(&buffer);
-  var allocator = Allocator.allocator();
+  var allocator = std.heap.FixedBufferAllocator.init(&buffer).allocator();
   _ = &allocator;
   var args = std.process.args();
   _ = args.skip();
@@ -64,29 +64,14 @@ pub fn main() !void{
     try stderr.print("Usages:\n\tmanager username [password]\nUsername Not Present\n", .{});
     return error.@"no username";
   };
-  if (!(try isValidUsername(username))) {
-    try stdout.print("Invalid Username\n", .{});
-    return ;
-  }
-  const udir = getDir(DB, username) orelse {
-    try stdout.print("User Does Not Exist\n", .{});
-    return ;
-  };
+  if (!(try isValidUsername(username))) return stdout.print("Invalid Username\n", .{});
 
-  const password = args.next() orelse {
-    try stdout.print("User Exists\n", .{});
-    return ;
-  };
+  const udir = getDir(DB, username) orelse return stdout.print("User Does Not Exist\n", .{});
+  const password = args.next() orelse return stdout.print("User Exists\n", .{});
+  const command = args.next() orelse return getAuth(udir, password, allocator);
 
-  const command = args.next() orelse {
-    return getAuth(udir, password, allocator);
-  };
+  if (std.mem.eql(u8, command, "create")) return createUser(DB, username, password);
 
-  if (std.mem.eql(u8, command, "create")) {
-    try createUser(DB, username, password);
-    try stdout.print("User Created");
-    return ;
-  }
   // return .{username, password};
   // try stderr.print("{s}\n{s}\n", .{x.@"0", x.@"1"});
 }
