@@ -6,14 +6,15 @@
   @apply size-60;
   @apply absolute;
   @apply rounded-full;
-  animation: fadeIn 6s ease-out;
+  animation: fadeIn 3s ease-out;
   animation-delay: 1s;
   animation-fill-mode: both;
 }
+
 @keyframes fadeIn {
   0% { opacity: 0; };
   10% {opacity: .25; };
-  100% { opacity: .75; };
+  100% { opacity: .45; };
 }
 
 #login-form > form{

@@ -22,6 +22,7 @@
     "boxicons": "^2.1.4",
     "solid-js": "^1.8.17",
     "solid-motionone": "^1.0.0",
-    "terser": "^5.31.0"
+    "terser": "^5.31.0",
+    "three": "^0.165.0"
   }
 }
