@@ -29,7 +29,7 @@ inline fn getAuth(udir: fs.Dir, password: [:0]const u8, allocator: std.mem.Alloc
     return error.@"getAuth openFile error";
   };
   defer file.close();
-  const file_pass = file.readToEndAlloc(allocator, 2048) catch {
+  const file_pass = file.readToEndAlloc(allocator, 1000) catch {
     return error.@"getAuth readToEndAlloc error";
   };
   _ = std.mem.indexOfDiff(u8, password, file_pass) orelse {
@@ -62,7 +62,7 @@ inline fn deleteUser(db: fs.Dir, username: [:0]const u8) !void {
 }
 
 pub fn main() !void{
-  var buffer: [4 << 10]u8 = undefined;
+  var buffer: [1024]u8 = undefined;
   var Allocator = std.heap.FixedBufferAllocator.init(&buffer);
   const allocator = Allocator.allocator();
 

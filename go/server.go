@@ -1,18 +1,21 @@
 package main
 
 import (
-  "context"
-  "encoding/json"
-  "notebook/nb"
-  
-  "fmt"
-  "net/http"
-  
-  "github.com/gin-gonic/gin"
-  "github.com/gorilla/websocket"
-  
-  "github.com/google/generative-ai-go/genai"
-  "google.golang.org/api/option"
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"notebook/nb"
+	"os"
+
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 )
 
 
@@ -39,112 +42,76 @@ func handleResp(conn *websocket.Conn, resp *genai.GenerateContentResponse) error
   return nil
 }
 
-// func handleFileUpload(conn *websocket.Conn, model *notebook.Model) error {
-//   // Define a struct to store file upload information
-//   type FileUpload struct {
-//     Filename string `json:"filename"`
-//     Size     int64  `json:"filename"`
-//     Data     []byte `json:"data"`
-//     Complete bool   `json:"complete"`
-//   }
-//
-//   var uploadBuffer []byte // Buffer to accumulate file chunks
-//
-//   for {
-//     messageType, message, err := conn.ReadMessage()
-//     if err != nil {
-//       if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-//         fmt.Println("Connection closed cleanly")
-//         return nil
-//       }
-//       fmt.Println("Error reading message:", err)
-//       conn.WriteMessage(websocket.TextMessage, []byte("Error reading file upload"))
-//       return err
-//     }
-//
-//     if messageType == websocket.TextMessage {
-//       var req FileUpload
-//       if err := json.Unmarshal(message, &req); err != nil {
-//         fmt.Println("Error invalid file upload json")
-//         conn.WriteMessage(websocket.TextMessage, []byte("Error: Invalid file upload data"))
-//         continue
-//       }
-//
-//       if req.Filename == "" || req.Size <= 0 {
-//         fmt.Println("Invalid file upload data")
-//         conn.WriteMessage(websocket.TextMessage, []byte("Error: Invalid file information"))
-//         continue
-//       }
-//
-//       // Accumulate data chunks
-//       uploadBuffer = append(uploadBuffer, req.Data...)
-//
-//       if req.Complete {
-//         // Process complete file
-//         err := processUploadedFile(uploadBuffer, req.Filename, model)
-//         if err != nil {
-//           fmt.Println("Error processing uploaded file:", err)
-//           conn.WriteMessage(websocket.TextMessage, []byte("Error uploading file"))
-//           return err
-//         }
-//         uploadBuffer = nil // Reset buffer for next upload
-//         conn.WriteMessage(websocket.TextMessage, []byte("File upload successful"))
-//         break
-//       }
-//     } else {
-//       fmt.Println("Unexpected message type:", messageType)
-//       conn.WriteMessage(websocket.TextMessage, []byte("Error: Unexpected message format"))
-//       continue
-//     }
-//   }
-//
-//   return nil
-// }
+func handleFileUpload(message []byte, dir string) error {
+  // if len(message) < 4 {
+  //   return errors.New("handleFileUpload data error")
+  // }
+  // slice_num := binary.BigEndian.Uint32(message)
+  // _ = slice_num
+  data := message
 
+  parts := bytes.SplitN(data, []byte{0}, 4)
+  if len(parts) < 2 || parts[1] == nil {
+    return errors.New("handleFileUpload parts error")
+  }
 
-func handleMessage(messageType int, message []byte, conn *websocket.Conn, model *notebook.Model ) error {
-  if messageType == websocket.PingMessage {
-    if err := conn.WriteMessage(websocket.PongMessage, message) ; err != nil{
-      return nil
-    }
-  } else if messageType == websocket.TextMessage {
-    var req RR
-    if err := json.Unmarshal(message, &req); err != nil {
-      fmt.Println("Error invalid message json")
-      conn.WriteMessage(websocket.TextMessage, []byte("Unknown Error: json.Unmarshal()"))
+  fileHash := string(parts[0])
+  payload := parts[1]
+
+  if len(payload) > (1<<20) {
+    return errors.New("handleFileUpload len violation") // Be Safe ?
+  }
+  
+  if dir == "" {
+    dir = os.TempDir() + "/AI_LMS"
+  }
+  f, err := os.OpenFile(dir + "/" + fileHash, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+  if err != nil {
+    return errors.New("handleFileUpload file open error")
+  }
+  defer f.Close()
+
+  _, err = f.Write(payload)
+  if err != nil {
+    return errors.New("handleFileUpload file write error")
+  }
+
+  return nil
+}
+
+func handleTextMessage(message []byte, conn *websocket.Conn, model *notebook.Model ) error {
+  var req RR
+  if err := json.Unmarshal(message, &req); err != nil {
+    fmt.Println(err)
+    return errors.New("Error invalid message json")
+  }
+
+  switch req.Command {
+  case -2: // AskJson
+    model.Json(true)
+    resp, err := model.Ask()
+    if err != nil {
       return err
     }
-
-    switch req.Command {
-    case -2: // AskJson
-      model.Json(true)
-      resp, err := model.Ask()
-      if err != nil {
-        conn.WriteMessage(websocket.TextMessage, []byte(string(err.Error())))
-        return err
-      }
-      return handleResp(conn, resp)
-    case -1: // Ask
-      model.Json(false)
-      resp, err := model.Ask()
-      if err != nil {
-        conn.WriteMessage(websocket.TextMessage, []byte(string(err.Error())))
-        return err
-      }
-      return handleResp(conn, resp)
-    case 0: // Clear Model
-      model.Parts = nil
-    case 1: // Ask
-      model.AddTXT(req.Message)
-      conn.WriteMessage(websocket.TextMessage, []byte("0"))
-    case 2: // File Upload
-      // handleFileUpload(...)
-      conn.WriteMessage(websocket.TextMessage, []byte("0"))
-    default:
-      fmt.Println("Error invalid Id / Message command")
-      conn.WriteMessage(websocket.TextMessage, []byte("Invalid Command"))
+    return handleResp(conn, resp)
+  case -1: // Ask
+    model.Json(false)
+    resp, err := model.Ask()
+    if err != nil {
+      return err
     }
-  }
+    return handleResp(conn, resp)
+  case 0: // Clear Model
+    model.Parts = nil
+  case 1: // AddTXT
+    model.AddTXT(req.Message)
+    return nil
+  case 2: // AddFile
+    // model.AddFILE(req.Message);
+    return nil
+  default:
+    return errors.New("Invalid Command")
+  };
   return nil
 }
 
@@ -173,6 +140,7 @@ func serve() error{
         c.JSON(http.StatusInternalServerError, err.Error())
         return
       }
+      var dir string = ""
 
       for {
         messageType, message, err := conn.ReadMessage()
@@ -184,7 +152,23 @@ func serve() error{
           fmt.Println("Error reading message: ", err)
           break
         }
-        handleMessage(messageType, message, conn, &model)
+        switch (messageType){
+        case websocket.PingMessage:
+          _ = conn.WriteMessage(websocket.PongMessage, message)
+          continue
+        case websocket.TextMessage:
+          if err := handleTextMessage(message, conn, &model); err != nil {
+            _ = conn.WriteMessage(websocket.TextMessage, []byte(string(err.Error()))) // Improve
+            continue
+          }
+        case websocket.BinaryMessage:
+          if err := handleFileUpload(message, dir); err != nil {
+            _ = conn.WriteMessage(websocket.TextMessage, []byte(string(err.Error()))) // Improve
+            continue
+          }
+        };
+        _ = conn.WriteMessage(websocket.TextMessage, []byte("0"))
+        
       }
     },
   );
