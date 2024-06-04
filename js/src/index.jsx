@@ -23,19 +23,27 @@ render(() => {
   setup();
   navigate('home');
   sidebar(true);
-  const Anim = x => <Motion class={'h-full' + (bar() ? ' min-[715px]:ml-56' : '')} transition={{ duration: .5, easing: 'ease-in-out' }} animate={{ opacity: [0, 1] }} exit={{ opacity: [1, .25], scale: [1, .65], transition: { duration: 0.2 } }}>{x.children}</Motion>;
-  const Anime = x => <Motion class={'h-full'} transition={{ duration: .5, easing: 'ease-in-out' }} animate={{ opacity: [0, 1] }} exit={{ opacity: [1, .25], scale: [1, .65], transition: { duration: 0.2 } }}>{x.children}</Motion>;
-
+  const Anim = x => (
+    <Motion
+      class={'h-full min-[715px]:ml-56'}
+      style={`animation:${bar()?'expand':'shrink'}MarginLeft ease-in-out .45s; animation-fill-mode:both`}
+      transition={{duration: .45, easing: 'ease-in-out'}}
+      animate={{opacity: [0, 1]}}
+      exit={{opacity:[1,.25], y: ['0','10%'], transition: {duration: 0.15}}}
+    >
+      {x.children}
+    </Motion>
+  );
   return (
     <>
-      <Show when={nav() !== 'login'}>
+      <Show when={nav() != 'login'}>
         <DefaultBar />
       </Show>
       <Suspense>
         <Presence exitBeforeEnter>
           <Switch>
             <Match when={nav() === 'login'}>
-              <Anime><Login /></Anime>
+              <Anim><Login /></Anim>
             </Match>
             <Match when={nav() === 'profcom'}>
               <Anim><Home /></Anim>

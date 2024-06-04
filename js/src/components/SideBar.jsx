@@ -65,7 +65,7 @@ function SideBar(components) {
       />
       <aside
         id='sidebar-menu'
-        class='z-50 select-none overflow-scroll fixed bg-[#080e21] p-1 box-content top-0 min-h-full h-full min-w-32 w-[13rem] transition-all'
+        class='z-50 select-none overflow-scroll fixed bg-[#080e2199] p-1 box-content top-0 min-h-full h-full min-w-32 w-[13rem] transition-all'
         style={bar()?'':'animation:slideOut .25s ease-out;animation-fill-mode:both'}
       >
         <div class='min-h-[90px] h-[10vh] mb-[6vh] rounded-2xl object-cover mt-[.75vh]'/>
