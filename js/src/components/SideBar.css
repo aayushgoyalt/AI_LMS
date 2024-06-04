@@ -9,41 +9,6 @@
   transform: rotate(10);
 }
 
-@keyframes slideOut {
-  0% { transform: translateX(0%) }
-  100% { transform: translateX(-100%) }
-}
-@keyframes slideIn {
-  0% { transform: translateX(-100%) }
-  100% { transform: translateX(0%) }
-}
-@keyframes rollUp {
-  100% {
-    left:-0.75rem;
-    top: -1.25rem;
-    border-radius: 100%;
-    transform: rotate(30deg);
-    @apply size-20 bg-blue-950;
-  }
-}
-@keyframes rollOut {
-  0% {
-    left:-0.75rem;
-    top: -1.25rem;
-    border-radius: 100%;
-    transform: rotate(30deg);
-    
-    @apply size-20 bg-blue-950;
-  }
-}
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; display: none; }
-}
-
-/* transition={{duration: .75, easing: 'ease-in-out'}}  */
-/* animate={{x: ['-22rem', 0]}} */
-/* exit={{ x: [0, '-22rem'], transition: {duration: .2}}} */
 #sidebar-menu > ul > li {
   font-size: 1rem;
 }

@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 * {
-  box-sizing: border-box;
+  @apply box-content selection:bg-red-400/25;
+  scrollbar-width: none;
 }
 
 html {
+  background: #100;
   height: 100%;
   color: #fff;
 }
@@ -20,16 +22,13 @@ body {
 }
 
 #root {
-  @apply overflow-scroll;
-  background: #020811; /* Dark blue background color */
   height: 100%;
-  --mouse-xp: 30%;
-  --mouse-yp: 30%;
-  background: radial-gradient(circle at var(--mouse-xp) var(--mouse-yp), #051a36, rgb(1, 3, 21)); /* Dark blue gradient */
+}
+
+#background-glow {
+  background: radial-gradient(closest-side circle at 50% 50%, #241818, #0000);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-
-
