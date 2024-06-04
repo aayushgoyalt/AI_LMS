@@ -1,15 +1,13 @@
-<<<<<<< HEAD
 # AI_LMS
-=======
 ## Requirement
 
 #### `linux` (or wsl on windows) or `macos` (not tested).
 
-`node` / `bun`, 
+`zig`,
 
-`libcurl` (probably present),
+`npm` / `bun`, 
 
-`gcc` / `clang`, 
+`go`, 
 
 gnu `make` (or run the commands yourself)
 
@@ -18,15 +16,11 @@ gnu `make` (or run the commands yourself)
 
 install dependencies with
 ```bash
-$ bun install
+$ zig build
 ```
-
-use `make` to install. run with `./server` from within `dist` dolder
 
 ## Development
 
-You can run: `bun run dev` 
-to start development server (for frontend)
+You can run: `bun run dev` in `js` directory to start development server (for frontend)
 
-for backend see `Makefile`. To enable printing debug info, uncomment `server/debug.h:5` 
->>>>>>> cbecb42 (Initial commit)
+for backend see `go/server.go`
