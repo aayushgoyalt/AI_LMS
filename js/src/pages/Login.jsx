@@ -21,8 +21,9 @@ export default function() {
   globalThis.__.Login = (
     <div class='flex justify-center select-none place-items-center h-full w-full overflow-hidden'>
       {/* Left Half: Three.js Component */}
-      <div class='w-1/2 h-full bg-navyblue '>
-        <ThreeText />
+      <div class='w-1/2 h-full bg-navyblue left-0 '>
+        <ThreeText 
+        />
       </div>
       {/* Right Half: Login Form */}
       <div id='login-form' class='w-1/2 h-full relative z-30 rounded-3xl shadow-black shadow-2xl border-none overflow-clip flex flex-col justify-center items-center'>
