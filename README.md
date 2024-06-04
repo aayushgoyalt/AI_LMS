@@ -7,7 +7,7 @@
 
 `go` 
 
-`npm` / bun
+`npm` / `bun`
 
 ## Usage
 
@@ -19,8 +19,10 @@ then build with
 ```bash
 $ zig build
 ```
-or to build with bun (npm is default)
+
+or to build with bun (npm is default) use
 ```bash
+$ zig build install-deps -Dbun
 $ zig build -Dbun
 ```
 ## Development

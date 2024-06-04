@@ -25,7 +25,7 @@ inline fn forceUpdateInstallDeps(b: *std.Build, cmdJs: [] const u8) *std.Build.S
 
 inline fn buildFrontEnd(b: *std.Build, cmdJs: [] const u8) *std.Build.Step {
   const FrontEnd = b.step("front-end", "build front-end");
-  const js = b.addSystemCommand(&.{cmdJs, "run", "build", "--", "--minify", "terser", "--outDir", b.fmt("{s}/dist", .{b.install_prefix}) });
+  const js = b.addSystemCommand(&.{cmdJs, "run", "build", "--", "--emptyOutDir", "--minify", "terser", "--outDir", b.fmt("{s}/dist", .{b.install_prefix}) });
   js.setCwd(b.path("js"));
   FrontEnd.dependOn(&js.step);
   return FrontEnd;
