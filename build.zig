@@ -2,7 +2,7 @@ const std = @import("std");
 
 inline fn runInstallDeps(b: *std.Build) *std.Build.Step {
   const InstallDeps = b.step("install-deps", "install all dependencies");
-  const js = b.addSystemCommand(&.{"bun", "npm"});
+  const js = b.addSystemCommand(&.{"npm"});
   js.setCwd(b.path("js"));
   js.addArgs(&.{ "install" });
   InstallDeps.dependOn(&js.step);
@@ -14,7 +14,7 @@ inline fn runInstallDeps(b: *std.Build) *std.Build.Step {
 }
 inline fn forceUpdateInstallDeps(b: *std.Build) *std.Build.Step {
   const UpdateInstallDeps = b.step("force-update-deps", "install all dependencies");
-  const js = b.addSystemCommand(&.{"bun", "npm"});
+  const js = b.addSystemCommand(&.{"npm"});
   js.setCwd(b.path("js"));
   js.addArgs(&.{ "update" });
   UpdateInstallDeps.dependOn(&js.step);
