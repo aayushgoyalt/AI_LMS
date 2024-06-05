@@ -1,12 +1,12 @@
 package LM
 
 import (
-	"context"
-	"errors"
-	"log"
-	"os"
-
-	"github.com/google/generative-ai-go/genai"
+  "context"
+  "errors"
+  "log"
+  "os"
+  
+  "github.com/google/generative-ai-go/genai"
 )
 
 /// Convert text to tokens
@@ -109,6 +109,16 @@ func (model *Model) AddTXT(text string) {
 /// convert and a file text to tokens pool
 func (model *Model) AddFILE(name string, dir string) error {
   convert(dir + name)
+  list, err := os.ReadDir(dir+"/")
+  if err != nil {
+    return errors.New("AddFILE opendir error")
+  }
+  for _, file := range list {
+    name := file.Name()
+    if !file.IsDir() && name[0] == '-' {
+      model.addPNG(dir+"/"+name)
+    }
+  }
   return nil
 }
 
