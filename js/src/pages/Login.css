@@ -33,7 +33,7 @@
   @apply mb-2;
   @apply ml-3;
 }
-#login-form > form > input{
+#login-form > form > input,.input-field{
   @apply px-4;
   @apply py-2;
   @apply w-full;
@@ -41,5 +41,6 @@
   background-color: rgba(255,255,255,0.07);
   @apply rounded-full;
   @apply mb-4;
+  @apply mt-3
 }
 
