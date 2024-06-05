@@ -1,4 +1,4 @@
-package notebook
+package LM
 
 import (
   "bytes"

@@ -1,4 +1,4 @@
-package notebook
+package LM
 
 import (
   "os"
@@ -71,7 +71,7 @@ func (model *Model) Json(huh bool){
 
 func (model *Model) Ask() (*genai.GenerateContentResponse, error){
   resp, err := model.cs.SendMessage(model.ctx, model.Parts...)
-  // model.parts = nil
+  model.Parts = nil
   if err != nil {
     return nil ,err
   }
@@ -86,7 +86,7 @@ func (model *Model) AddTXT(text string) {
   model.Add(PartsTXT(text))
 }
 
-func (model *Model) AddPNG(location string) error{
+func (model *Model) addPNG(location string) error{
   part, err := PartsPNG(location)
   if err != nil {
     return err
@@ -95,7 +95,12 @@ func (model *Model) AddPNG(location string) error{
   return nil
 }
 
-
-
+func (model *Model) AddFILE(name string, dir string) error {
+  if dir == "" {
+    dir = os.TempDir() + "/AI_LMS"
+  }
+  // path := dir + "/" + name
+  return nil
+}
 
 

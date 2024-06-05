@@ -1,4 +1,4 @@
-module notebook
+module LM
 
 go 1.22.2
 

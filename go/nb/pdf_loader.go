@@ -1,11 +1,11 @@
-package notebook
+package LM
 
 import (
   "os/exec"
 )
 
-func Curl_pdf_to_text(str string) (string, error){
-  cmd := exec.Command("pdftotext",str,"-")
+func convert(path string) (error){
+  cmd := exec.Command("pdftocairo", path, "-png", "")
   output, err := cmd.Output()
   if err != nil {
     return "", err
