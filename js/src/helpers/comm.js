@@ -39,6 +39,23 @@ const reconnectingWs = {
   },
 }
 
+function hash(file) {
+  const encoder = new TextEncoder()
+  function xorArrays(arr1, arr2) {
+    const maxLength = Math.max(arr1.length, arr2.length);
+    const result = new Uint8Array(maxLength);
+    for (let i = 0; i < maxLength; i++) {
+      result[i] = (arr1[i] || 0) ^ (arr2[i] || 0);
+    }
+    return result;
+  }
+  const preHash = xorArrays(
+    xorArrays(encoder.encode(""+file.type), encoder.encode(""+file.webkitRelativePath)),
+    xorArrays(encoder.encode(""+file.name), encoder.encode(""+file.size))
+  );
+  return btoa(preHash).padEnd(64, "0").substring(0,64);
+}
+
 export default {
   ws: undefined,
   init: function(location) { if (location) {this.ws = reconnectingWs.init(location)} else {this.init('/ws')}; return this; },

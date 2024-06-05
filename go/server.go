@@ -37,10 +37,10 @@ func handleResp(conn *websocket.Conn, resp *genai.GenerateContentResponse) error
     case genai.Text:
       return conn.WriteMessage(websocket.TextMessage, []byte(p))
     default:
-      log.Fatal("Unknown genai.Part type:", p)
+      fmt.Println("Unknown genai.Part type:", p)
+      return errors.New("handleResp unknown respose type error")
     }
   }
-  return nil
 }
 
 /// handle binary message sent to ws
@@ -64,12 +64,10 @@ func handleFileUpload(message []byte, dir string) error {
     return errors.New("handleFileUpload len violation") // Be Safe ?
   }
   
-  if dir == "" {
-    dir = os.TempDir() + "/AI_LMS"
-  }
   f, err := os.OpenFile(dir + "/" + fileHash, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
   if err != nil {
-    return errors.New("handleFileUpload file open error")
+    return err
+    // return errors.New("handleFileUpload file open error")
   }
   defer f.Close()
 
@@ -147,7 +145,10 @@ func serve() error{
         c.JSON(http.StatusInternalServerError, err.Error())
         return
       }
-      var dir string = ""
+      dir := os.TempDir() + "/AI_LMS"
+      // if err := os.Mkdir(dir, os.ModePerm); err != nil {
+      //   fmt.Println(err)
+      // }
 
       for {
         messageType, message, err := conn.ReadMessage()
