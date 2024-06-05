@@ -11,12 +11,6 @@
   animation-fill-mode: both;
 }
 
-@keyframes fadeIn {
-  0% { opacity: 0; };
-  10% {opacity: .25; };
-  100% { opacity: .45; };
-}
-
 #login-form > form{
   @apply px-16 py-20;
   @apply max-[360px]:px-10;

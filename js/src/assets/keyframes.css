@@ -5,19 +5,19 @@
 
 /* Login Screen */
 @keyframes fadeIn {
-0% { opacity: 0; }
-10% {opacity: .25; }
-100% { opacity: .75; }
+  0% { opacity: 0; }
+  10% {opacity: .25; }
+  100% { opacity: .75; }
 }
 
 /* SideBar */
 @keyframes slideOut {
-  0% { transform: translateX(0%) }
-  100% { transform: translateX(-100%) }
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }
 @keyframes slideIn {
-  0% { transform: translateX(-100%) }
-  100% { transform: translateX(0%) }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
 }
 
 /* SideBar Background */
@@ -28,9 +28,7 @@
 
 /* Sidebar Logo */
 @keyframes rollUp {
-  0% {
-    clip-path: circle(100%);
-  }
+  0% { clip-path: circle(100%); }
   100% {
     @apply object-center object-cover -top-6 -left-9 min-h-0 size-24;
     clip-path: circle(31%);
@@ -45,9 +43,7 @@
     object-fit: cover;
     transform: rotate(30deg);
   }
-  100% {
-    clip-path: circle(100%);
-  }
+  100% { clip-path: circle(100%); }
 }
 
 /* Content */

@@ -3,11 +3,13 @@
 
 #### `linux` (or wsl on windows) or `macos` (not tested).
 
-`zig`
+`npm` / `bun` for front end
 
-`go` 
+`go` for backend
 
-`npm` / `bun`
+`zig` as build system
+
+`unoconv` and `poppler` for file conversion
 
 ## Usage
 
