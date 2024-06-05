@@ -1,42 +1,57 @@
 'use strict';
 
-const CHUNK_SIZE = 1024 * 1024;
+const CHUNK_SIZE = 8;
+const FILENAME_LENGTH = 64;
+const EMPTY_CALLBACK = ()=>{};
+
 
 const reconnectingWs = {
   ws: undefined,
   buffer: [],
   tempData: undefined,
   tempCallback: undefined,
+  sending: false,
+  location: undefined,
   init: function(location) {
+    this.location = location;
     this.ws = new WebSocket(location);
     this.ws.onmessage = (message) => {
-      console.log(this);
-      if (this.tempCallback != undefined) { this.tempCallback(message) }
-      else { console.log(message) } // For testing only
-      if (this.buffer.length !== 0) {
-        const data = this.buffer.pop();
-        this.tempData = data[0];
-        this.tempCallback = data[1];
-        this.ws.send(this.tempData);
-      }
+      this.tempData = undefined;
+      this.sending = false;
+      const callback = this.tempCallback;
+      this.asyncSend();
+      if ( callback ) { callback(message) }
+      else { console.log(message); } // For testing only
     };
     this.ws.onerror = () => { this.ws.send(this.tempData); };
-    this.ws.onclose = () => { this.ws = new WebSocket(location); };
+    this.ws.onclose = () => { this.ws = new WebSocket(this.location); };
     return this;
   },
   send: function(data, callback) {
     this.buffer.unshift([data, callback]);
-    if (this.buffer.length !== 0) {
-      const data = this.buffer.pop();
-      this.tempData = data[0];
-      this.tempCallback = data[1];
-      this.ws.send(data[0]);
-    }
+    this.asyncSend();
   },
   deinit: function() {
     this.ws = undefined;
     this.buffer = [];
   },
+  asyncSend: async function (parent){
+    if (!parent) { parent = this; }
+    switch (parent.ws.readyState){
+      case parent.ws.CONNECTING: setTimeout(()=>{parent.asyncSend(parent);}, 10); return;
+      case parent.ws.CLOSED: parent.ws = new WebSocket(location); return
+    }
+    if (parent.sending) { return; }
+    parent.sending = true;
+    if (parent.tempData) { parent.ws.send(parent.tempData); return ; }
+    if (parent.buffer.length !== 0) {
+      const data = parent.buffer.pop();
+      parent.tempData = data[0];
+      parent.tempCallback = data[1];
+      parent.ws.send(parent.tempData);
+      return ;
+    }
+  }
 }
 
 function hash(file) {
@@ -53,7 +68,7 @@ function hash(file) {
     xorArrays(encoder.encode(""+file.type), encoder.encode(""+file.webkitRelativePath)),
     xorArrays(encoder.encode(""+file.name), encoder.encode(""+file.size))
   );
-  return btoa(preHash).padEnd(64, "0").substring(0,64);
+  return btoa(preHash).padEnd(64, "0").substring(0,FILENAME_LENGTH);
 }
 
 export default {
@@ -64,18 +79,27 @@ export default {
   clear: function(callback) { this.ws.send(JSON.stringify({C:0,M:""}), callback); return this; },
   addText: function(message, callback) { this.ws.send(JSON.stringify({C:1,M:message}), callback); return this; },
   addFile: function(file, callback) {
-    let reader = new FileReader();
-    const filename = hash(file) + '\0';
-    reader.onload = (e) => {
-      const chunk = new Uint8Array(e.target.result);
-      const data = new Uint8Array(filename.length + chunk.length);
-
-      data.set(new TextEncoder().encode(filename));
-      data.set(chunk, filename.length);
-      if (reader.readyState === FileReader.DONE) { this.ws.send(data, callback);return; }
-      this.ws.send(data, undefined);
-      //console.log(data);
-      reader.readAsArrayBuffer(file.slice(reader.result.length, reader.result.length + CHUNK_SIZE));
+    const reader = new FileReader();
+    const ws = this.ws;
+    const filename = (new TextEncoder()).encode(hash(file) + '\0');
+    const data = new Uint8Array(FILENAME_LENGTH + CHUNK_SIZE);
+    data.set(filename);
+    var offset = 0;
+    reader.onload = () => {
+      const chunk = new Uint8Array(reader.result);
+      offset = offset + chunk.length;
+      let d = data;
+      console.log(chunk.length, chunk);
+      if (chunk.length !== CHUNK_SIZE){
+        d = new Uint8Array(FILENAME_LENGTH + chunk.length);
+        d.set(filename);
+      }
+      d.set(chunk, FILENAME_LENGTH);
+      if (offset < file.size) {
+        console.log(offset);
+        ws.send(data, EMPTY_CALLBACK);
+        reader.readAsArrayBuffer(file.slice(offset, offset + CHUNK_SIZE));
+      } else { ws.send(data, callback); }
     };
     reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
     return this;

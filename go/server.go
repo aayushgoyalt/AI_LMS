@@ -146,9 +146,6 @@ func serve() error{
         return
       }
       dir := os.TempDir() + "/AI_LMS"
-      // if err := os.Mkdir(dir, os.ModePerm); err != nil {
-      //   fmt.Println(err)
-      // }
 
       for {
         messageType, message, err := conn.ReadMessage()
@@ -185,6 +182,9 @@ func serve() error{
 }
 
 func main(){
+  if err := os.Mkdir(os.TempDir() + "/AI_LMS", os.ModePerm); err != nil {
+    fmt.Println(err)
+  }
   err := serve();
   if err != nil {
     log.Fatal("cannot initialize server")
