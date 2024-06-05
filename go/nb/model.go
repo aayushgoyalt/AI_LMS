@@ -8,11 +8,13 @@ import (
   "github.com/google/generative-ai-go/genai"
 )
 
-func PartsTXT(text string) genai.Part {
+/// Convert text to tokens
+func partsTXT(text string) genai.Part {
   return genai.Text(text)
 }
 
-func PartsPNG(location string) (genai.Part, error){
+/// Convert png to tokens
+func partsPNG(location string) (genai.Part, error){
   part, err := os.ReadFile(location)
   if err != nil {
     return nil, err
@@ -21,6 +23,7 @@ func PartsPNG(location string) (genai.Part, error){
   return genai.ImageData("png", part), nil
 }
 
+/// The LM interface
 type Model struct {
   model *genai.GenerativeModel;
   cs *genai.ChatSession;
@@ -44,10 +47,11 @@ type Model struct {
   //   },
   // }
 
-func (model *Model) Init(client *genai.Client ,history []*genai.Content) error {
+/// Initialize the model
+func (model *Model) Init(name string, client *genai.Client, history []*genai.Content) error {
   model.Parts = nil
   model.ctx = context.Background()
-  model.model = client.GenerativeModel("gemini-1.5-flash")
+  model.model = client.GenerativeModel(name)
   model.cs = model.model.StartChat()
   if history != nil {
     model.cs.History = history
@@ -78,29 +82,29 @@ func (model *Model) Ask() (*genai.GenerateContentResponse, error){
   return resp, nil
 }
 
-func (model *Model) Add(part genai.Part) {
+/// add `part` to tokens pool
+func (model *Model) add(part genai.Part) {
   model.Parts = append(model.Parts, part)
 }
 
-func (model *Model) AddTXT(text string) {
-  model.Add(PartsTXT(text))
-}
-
+/// convert and add a png at `location` to tokens pool
 func (model *Model) addPNG(location string) error{
-  part, err := PartsPNG(location)
+  part, err := partsPNG(location)
   if err != nil {
     return err
   }
-  model.Add(part)
+  model.add(part)
   return nil
 }
 
+/// convert and add text to tokens pool
+func (model *Model) AddTXT(text string) {
+  model.add(partsTXT(text))
+}
+
+/// convert and a file text to tokens pool
 func (model *Model) AddFILE(name string, dir string) error {
-  if dir == "" {
-    dir = os.TempDir() + "/AI_LMS"
-  }
-  // path := dir + "/" + name
+  convert(dir + name)
   return nil
 }
-
 

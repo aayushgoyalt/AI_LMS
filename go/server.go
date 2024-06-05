@@ -28,6 +28,7 @@ var upgrader = websocket.Upgrader{
 }
 
 
+/// respond to the ask request
 func handleResp(conn *websocket.Conn, resp *genai.GenerateContentResponse) error{
   if resp == nil || len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil || len(resp.Candidates[0].Content.Parts) == 0{
     return errors.New("handleResp respose error")
@@ -41,6 +42,8 @@ func handleResp(conn *websocket.Conn, resp *genai.GenerateContentResponse) error
   }
   return nil
 }
+
+/// handle binary message sent to ws
 func handleFileUpload(message []byte, dir string) error {
   // if len(message) < 4 {
   //   return errors.New("handleFileUpload data error")
@@ -77,6 +80,8 @@ func handleFileUpload(message []byte, dir string) error {
 
   return nil
 }
+
+/// Handle text message sent to ws
 func handleTextMessage(message []byte, dir string, conn *websocket.Conn, model *LM.Model ) error {
   var req struct {
     Command int32  `json:"C"`
@@ -116,6 +121,7 @@ func handleTextMessage(message []byte, dir string, conn *websocket.Conn, model *
   return nil
 }
 
+/// The main server function
 func serve() error{
   fmt.Println("Starting on", route)
 
@@ -136,7 +142,7 @@ func serve() error{
       defer conn.Close()
 
       model := LM.Model{};
-      err = model.Init(client, nil)
+      err = model.Init("gemini-1.5-pro", client, nil)
       if err != nil{
         c.JSON(http.StatusInternalServerError, err.Error())
         return
@@ -177,49 +183,49 @@ func serve() error{
   return nil
 }
 
-// pdftocairo a.pdf -png
-// unoconv
-
-func main(){
-//  his := []*genai.Content{
-//    &genai.Content{
-//      Parts: []genai.Part{
-// genai.Text("From Now on, you will respond in Json"),
-//      },
-//      Role: "user",
-//    },
-//    &genai.Content{
-//      Parts: []genai.Part{
-// genai.Text("{'okay': true}"),
-//      },
-//      Role: "model",
-//    },
-//  }
-//  _ = his
-//  his = nil
-//  fmt.Println("Starting")
-//
-//  client, _ := genai.NewClient(context.Background(), option.WithAPIKey(api_key))
-//  model := LM.Model{};
-//  _ = model.Init(client, his)
-//
-//  model.AddTXT("Mcq on science")
-//  resp, err := model.Ask();
-//  if err != nil {
-//    panic("Reaponse Err")
-//  }
-//
-//  parts := resp.Candidates[0].Content.Parts
-//  for _, j := range parts {
-//    switch j := j.(type) {
-//    case genai.Text:
-//      fmt.Println(string(j)) // Convert genai.Text to string
-//    default:
-//      log.Fatal("Unknown genai.Part type:", j)
-//  }
-//  }
 
 
+/// Tempary testing function
+func ask(){
+  his := []*genai.Content{
+    &genai.Content{
+      Parts: []genai.Part{
+        genai.Text("From Now on, you will respond in Json"),
+      },
+      Role: "user",
+    },
+    &genai.Content{
+      Parts: []genai.Part{
+        genai.Text("{'okay': true}"),
+      },
+      Role: "model",
+    },
+  }
+  _ = his
+  his = nil
+  fmt.Println("Starting")
 
+  client, _ := genai.NewClient(context.Background(), option.WithAPIKey(api_key))
+  model := LM.Model{};
+  _ = model.Init("gemini-1.5-pro", client, his)
+
+  model.AddTXT("Mcq on science")
+  resp, err := model.Ask();
+  if err != nil {
+    panic("Reaponse Err")
+  }
+
+  parts := resp.Candidates[0].Content.Parts
+  for _, j := range parts {
+    switch j := j.(type) {
+    case genai.Text:
+      fmt.Println(string(j)) // Convert genai.Text to string
+    default:
+      log.Fatal("Unknown genai.Part type:", j)
+    };
+  }
 }
 
+func main(){
+  for { ask() }
+}
