@@ -1,3 +1,4 @@
+'use strict';
 import { onCleanup } from 'solid-js';
 import * as THREE from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';

@@ -2,7 +2,7 @@
 import { createSignal, Show } from 'solid-js';
 import { navigate, sidebar } from '../helpers/state';
 import './Login.css';
-import ThreeText from './ThreeText';
+import ThreeText from '../components/ThreeText';
 
 export default function() {
   if (globalThis.__.Login) return globalThis.__.Login;

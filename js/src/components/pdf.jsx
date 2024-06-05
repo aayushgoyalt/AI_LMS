@@ -1,5 +1,4 @@
 'use strict';
-
 import { For } from "solid-js";
 
 const SamplePage = () => {

@@ -1,3 +1,4 @@
+'use strict';
 import { createSignal } from 'solid-js';
 
 const Archive = () => {
