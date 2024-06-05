@@ -1,11 +1,12 @@
 package LM
 
 import (
-  "os"
-  "log"
-  "context"
-  
-  "github.com/google/generative-ai-go/genai"
+	"context"
+	"errors"
+	"log"
+	"os"
+
+	"github.com/google/generative-ai-go/genai"
 )
 
 /// Convert text to tokens
@@ -69,11 +70,14 @@ func (model *Model) Json(huh bool){
     model.model.GenerationConfig.ResponseMIMEType = "plain/text"
   }
   model.prev = huh
-  model.cs = model.model.StartChat()
+  // model.cs = model.model.StartChat()
 }
 
 
 func (model *Model) Ask() (*genai.GenerateContentResponse, error){
+  if model.Parts == nil {
+    return nil,errors.New("Ask nothing error")
+  }
   resp, err := model.cs.SendMessage(model.ctx, model.Parts...)
   model.Parts = nil
   if err != nil {

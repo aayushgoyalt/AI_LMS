@@ -9,8 +9,10 @@ const reconnectingWs = {
   tempCallback: undefined,
   init: function(location) {
     this.ws = new WebSocket(location);
-    this.ws.onmessage = (_) => {
-      if (tempCallback) tempCallback(e);
+    this.ws.onmessage = (message) => {
+      console.log(this);
+      if (this.tempCallback != undefined) { this.tempCallback(message) }
+      else { console.log(message) } // For testing only
       if (this.buffer.length !== 0) {
         const data = this.buffer.pop();
         this.tempData = data[0];
@@ -18,17 +20,17 @@ const reconnectingWs = {
         this.ws.send(this.tempData);
       }
     };
-    this.ws.onerror   = () => { this.ws.send(this.tempData); };
-    this.ws.onclose   = () => { this.ws = new WebSocket(location); };
-    this.ws.onconnect = () => {console.log(me, "Done", this);}
-    this.ws.onerror   = () => {console.log(me, "Done", this);}
+    this.ws.onerror = () => { this.ws.send(this.tempData); };
+    this.ws.onclose = () => { this.ws = new WebSocket(location); };
+    return this;
   },
   send: function(data, callback) {
     this.buffer.unshift([data, callback]);
     if (this.buffer.length !== 0) {
       const data = this.buffer.pop();
-      this.ws.send(data[0]);
+      this.tempData = data[0];
       this.tempCallback = data[1];
+      this.ws.send(data[0]);
     }
   },
   deinit: function() {
@@ -37,29 +39,29 @@ const reconnectingWs = {
   },
 }
 
-export default RPC = {
+export default {
   ws: undefined,
-  init: function(location) { this.ws = reconnectingWs.init(location); },
-  askText: function() { this.ws.send(JSON.stringify({C:-1,M:message})); },
-  askJson: function() { this.ws.send(JSON.stringify({C:-2,M:message})); },
-  clear: function() { this.ws.send(JSON.stringify({C:-2,M:""})); },
-  addText: function(message) { this.ws.send(JSON.stringify({C:-1,M:message})); },
-  addFile: function(file) {
+  init: function(location) { if (location) {this.ws = reconnectingWs.init(location)} else {this.init('/ws')}; return this; },
+  askText: function(callback) { this.ws.send(JSON.stringify({C:-1,M:''}), callback); return this; },
+  askJson: function(callback) { this.ws.send(JSON.stringify({C:-2,M:''}), callback); return this; },
+  clear: function(callback) { this.ws.send(JSON.stringify({C:0,M:""}), callback); return this; },
+  addText: function(message, callback) { this.ws.send(JSON.stringify({C:1,M:message}), callback); return this; },
+  addFile: function(file, callback) {
     let reader = new FileReader();
     const filename = hash(file) + '\0';
     reader.onload = (e) => {
-
       const chunk = new Uint8Array(e.target.result);
       const data = new Uint8Array(filename.length + chunk.length);
 
       data.set(new TextEncoder().encode(filename));
       data.set(chunk, filename.length);
-      this.ws.send(data);
+      if (reader.readyState === FileReader.DONE) { this.ws.send(data, callback);return; }
+      this.ws.send(data, undefined);
       //console.log(data);
-      if (reader.readyState === FileReader.DONE) { return; }
       reader.readAsArrayBuffer(file.slice(reader.result.length, reader.result.length + CHUNK_SIZE));
     };
     reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
+    return this;
   },
 };
 

@@ -14,6 +14,13 @@ import Home from './pages/Home';
 import History from './pages/History';
 import Archive from './pages/Archive';
 
+
+// For testing only
+import RPC from './helpers/comm.js'
+globalThis.RPC = RPC;
+//
+
+
 const root = document.getElementById('root');
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error('Root element not found !!');

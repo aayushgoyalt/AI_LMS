@@ -1,5 +1,5 @@
 # AI_LMS
-## Requirement
+## Requirements
 
 #### `linux` (or wsl on windows) or `macos` (not tested).
 
@@ -12,6 +12,11 @@
 `unoconv` and `poppler` for file conversion
 
 ## Usage
+
+install the Requirements listed above. On Arch-Linux you can run
+```bash
+# sudo pacman --noconfirm -S go npm zig poppler unoconv
+```
 
 install build dependencies with
 ```bash
@@ -29,6 +34,7 @@ $ zig build -Dbun
 ```
 ## Development
 
+for backend development run `zig build -Ddev`
+
 You can run: `npm run dev` in `js` directory to start development server (for frontend)
 
-for backend see `go/server.go`
