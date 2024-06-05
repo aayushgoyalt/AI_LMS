@@ -33,10 +33,7 @@ render(() => {
     >
       {x.children}
     </Motion>
-
-    
   );
-  const Anime = x => <Motion class={'h-full'} transition={{ duration: .5, easing: 'ease-in-out' }} animate={{ opacity: [0, 1] }} exit={{ opacity: [1, .25], scale: [1, .65], transition: { duration: 0.2 } }}>{x.children}</Motion>;
   return (
     <>
       <Show when={nav() != 'login'}>
@@ -46,7 +43,7 @@ render(() => {
         <Presence exitBeforeEnter>
           <Switch>
             <Match when={nav() === 'login'}>
-              <Anime><Login /></Anime>
+              <Anim><Login /></Anim>
             </Match>
             <Match when={nav() === 'profcom'}>
               <Anim><Home /></Anim>

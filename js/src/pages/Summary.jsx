@@ -1,9 +1,7 @@
-import React from 'react'
 
-const Summary = () => {
+export default function() {
   return (
     <div>Summary</div>
   )
 }
 
-export default Summary
