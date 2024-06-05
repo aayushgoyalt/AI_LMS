@@ -28,20 +28,20 @@ inline fn forceUpdateInstallDeps(b: *std.Build, cmdJs: [] const u8) *std.Build.S
   return UpdateInstallDeps;
 }
 
-inline fn buildFrontEnd(b: *std.Build, cmdJs: [] const u8, optionWatch :bool) *std.Build.Step {
+inline fn buildFrontEnd(b: *std.Build, cmdJs: [] const u8, optionDev :bool) *std.Build.Step {
   const FrontEnd = b.step("front-end", "build front-end");
 
   const js = b.addSystemCommand(&.{cmdJs, "run", "build", "--", "--emptyOutDir", "--minify", "terser", "--outDir", b.fmt("{s}/dist", .{b.install_prefix}) });
   js.setCwd(b.path("js"));
 
-  if (optionWatch) js.addArg("--watch");
+  if (optionDev) js.addArg("--watch");
 
   FrontEnd.dependOn(&js.step);
 
   return FrontEnd;
 }
 
-inline fn buildServer(b: *std.Build, optionWatch :bool) *std.Build.Step {
+inline fn buildServer(b: *std.Build, optionDev :bool) *std.Build.Step {
   const Server = b.step("server", "build the go server");
 
   const go = b.addSystemCommand(&.{ "go", "build", "-o", b.fmt("{s}/server", .{b.install_prefix}) });
@@ -49,7 +49,7 @@ inline fn buildServer(b: *std.Build, optionWatch :bool) *std.Build.Step {
 
   Server.dependOn(&go.step);
 
-  if (optionWatch) {
+  if (optionDev) {
     const server = b.addSystemCommand(&.{ "./server" });
     server.setCwd(std.Build.LazyPath{ .path = b.install_prefix });
     Server.dependOn(&server.step);
@@ -66,12 +66,12 @@ pub fn build(b: *std.Build) void {
   var cmdJs = "npm";
   if (optionBun) cmdJs = "bun";
 
-  const optionWatch = b.option(bool, "watch", "rebuild front-end when files change") orelse false;
-  b.addOptions().addOption(bool, "version", optionWatch);
+  const optionDev = b.option(bool, "dev", "run a developement front-end server") orelse false;
+  b.addOptions().addOption(bool, "version", optionDev);
 
   _ = runInstallDeps(b, cmdJs);
   _ = forceUpdateInstallDeps(b, cmdJs);
-  b.getInstallStep().dependOn(buildFrontEnd(b, cmdJs, optionWatch));
-  b.getInstallStep().dependOn(buildServer(b, optionWatch));
+  b.getInstallStep().dependOn(buildFrontEnd(b, cmdJs, optionDev));
+  b.getInstallStep().dependOn(buildServer(b, optionDev));
 }
 
