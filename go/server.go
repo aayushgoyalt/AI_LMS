@@ -29,13 +29,17 @@ var upgrader = websocket.Upgrader{
 
 
 /// respond to the ask request
-func handleResp(conn *websocket.Conn, resp *genai.GenerateContentResponse) error{
+func handleResp(model *LM.Model) error{
+  resp, err := model.Ask()
+  if err != nil {
+    return err
+  }
   if resp == nil || len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil || len(resp.Candidates[0].Content.Parts) == 0{
     return errors.New("handleResp respose error")
   } else {
     switch p := resp.Candidates[0].Content.Parts[0].(type) {
     case genai.Text:
-      return conn.WriteMessage(websocket.TextMessage, []byte(p))
+      return errors.New(string(p))
     default:
       fmt.Println("Unknown genai.Part type:", p)
       return errors.New("handleResp unknown respose type error")
@@ -80,7 +84,7 @@ func handleFileUpload(message []byte, dir string) error {
 }
 
 /// Handle text message sent to ws
-func handleTextMessage(message []byte, dir string, conn *websocket.Conn, model *LM.Model ) error {
+func handleTextMessage(message []byte, dir string, model *LM.Model ) error {
   var req struct {
     Command int32  `json:"C"`
     Message string `json:"M"`
@@ -93,18 +97,10 @@ func handleTextMessage(message []byte, dir string, conn *websocket.Conn, model *
   switch req.Command {
   case -2: // AskJson
     model.Json(true)
-    resp, err := model.Ask()
-    if err != nil {
-      return err
-    }
-    return handleResp(conn, resp)
+    return handleResp(model)
   case -1: // Ask
     model.Json(false)
-    resp, err := model.Ask()
-    if err != nil {
-      return err
-    }
-    return handleResp(conn, resp)
+    return handleResp(model)
   case 0: // Clear Model
     model.Parts = nil
     return nil
@@ -162,7 +158,7 @@ func serve() error{
           _ = conn.WriteMessage(websocket.PongMessage, message)
           continue
         case websocket.TextMessage:
-          if err := handleTextMessage(message, dir, conn, &model); err != nil {
+          if err := handleTextMessage(message, dir, &model); err != nil {
             _ = conn.WriteMessage(websocket.TextMessage, []byte(string(err.Error()))) // Improve
             continue
           }

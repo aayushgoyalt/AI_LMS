@@ -51,6 +51,8 @@ const reconnectingWs = {
       parent.ws.send(parent.tempData);
       return ;
     }
+    parent.sending = false;
+    //setTimeout(()=>{parent.asyncSend(parent);}, 10);
   }
 }
 

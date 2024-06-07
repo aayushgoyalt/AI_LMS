@@ -1,28 +1,40 @@
 'use strict';
 
-import { bar } from '../helpers/state.jsx'
+import { bar, rpc } from '../helpers/state.jsx'
 import Pdf from '../components/pdf'
-
 import './Home.css'
 
 
 export default function() {
   let parent, text_input;
+  const RPC = rpc();
+
   function make(){
     const x = text_input.value;
-    text_input.value = "";
+    if (x == "") return;
+    console.log(RPC.addText(x));
+    let response;
     parent.appendChild(
-      <span
-        class="w-max-[85%] w-auto bg-blue-900/25 px-4 py-2  mt-2 rounded-lg mx-4"
-        style="animation: slideUp 1s ease-in-out;"
-      >
-        {x}
-      </span>
+      <div>
+        <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
+          <div class="flex-grow" />
+          <span class="right-0 bg-blue-900/25 px-4 py-2 mt-2 rounded-lg mx-4">
+            {x}
+          </span>
+        </div>
+        <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
+          <span class="right-0 bg-blue-900/25 px-4 py-2 mt-2 rounded-lg mx-4" ref={response}>
+          </span>
+        </div>
+      </div>
     );
+    text_input.value = "";
+    let func = true;
+    RPC.askText((e)=>{ if (func){response.innerText = e.data; func=undefined;} });
   }
   return (
     <div class="overflow-y-scroll flex flex-row mr-[25vw]">
-      <div class={"h-full flex flex-col pt-2 px-1 py-1 "+(bar()?'w-[55vw]':'w-[60vw] ml-28')} ref={parent}></div>
+      <div class={"h-full flex flex-col pt-2 px-1 py-1 mb-16 "+(bar()?'w-[55vw]':'w-[60vw] ml-28')} ref={parent}></div>
       <form class="flex max-w-full fixed left-[15rem] bottom-3 w-[50vw] z-20">   
         <label for="voice-search" class="sr-only">Search</label>
         <input type="text"
