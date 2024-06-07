@@ -28,13 +28,13 @@ export default function() {
       <div>
         <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
           <div class="flex-grow" />
-          <span class="right-0 bg-sky-500/35 px-4 py-2 mt-2 rounded-lg mx-4">
+          <span class="right-0 bg-sky-500/25 px-4 py-2 mt-2 rounded-lg mx-4">
             {x}
           </span>
         </div>
-        <div class="flex flex-col w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
-          <span class="flex flex-col right-0 bg-blue-800/25 px-4 py-2 mt-2 rounded-lg mx-4 overflow-scroll" ref={response}>
-          </span>
+        <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
+          <div class="flex flex-col right-0 bg-blue-800/25 px-4 py-2 mt-2 rounded-lg mx-4 overflow-scroll w-auto" ref={response} />
+          <div class="flex-grow" />
         </div>
       </div>
     );
