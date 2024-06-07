@@ -1,9 +1,18 @@
 'use strict';
+import Pdf from '../components/pdf'
 
 import { bar, rpc } from '../helpers/state.jsx'
-import Pdf from '../components/pdf'
 import './Home.css'
 
+
+import MarkdownIt from 'markdown-it';
+
+const md = new MarkdownIt();
+
+function format(divElement, markdownText) {
+  const formattedText = md.render(markdownText);
+  divElement.innerHTML = formattedText;
+}
 
 export default function() {
   let parent, text_input;
@@ -13,24 +22,31 @@ export default function() {
     const x = text_input.value;
     if (x == "") return;
     console.log(RPC.addText(x));
+
     let response;
     parent.appendChild(
       <div>
         <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
           <div class="flex-grow" />
-          <span class="right-0 bg-blue-900/25 px-4 py-2 mt-2 rounded-lg mx-4">
+          <span class="right-0 bg-sky-500/35 px-4 py-2 mt-2 rounded-lg mx-4">
             {x}
           </span>
         </div>
-        <div class="flex flex-row w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
-          <span class="right-0 bg-blue-900/25 px-4 py-2 mt-2 rounded-lg mx-4" ref={response}>
+        <div class="flex flex-col w-max-[85%] w-auto" style="animation: slideUp 1s ease-in-out;">
+          <span class="flex flex-col right-0 bg-blue-800/25 px-4 py-2 mt-2 rounded-lg mx-4 overflow-scroll" ref={response}>
           </span>
         </div>
       </div>
     );
     text_input.value = "";
     let func = true;
-    RPC.askText((e)=>{ if (func){response.innerText = e.data; func=undefined;} });
+    RPC.askText((e)=>{
+      if (func){
+        format(response, e.data);
+        response.scrollIntoView({ behavior: 'smooth' });
+        func=undefined;
+      } 
+    });
   }
   return (
     <div class="overflow-y-scroll flex flex-row mr-[25vw]">
