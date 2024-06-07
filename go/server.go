@@ -56,7 +56,7 @@ func handleFileUpload(message []byte, dir string) error {
   // _ = slice_num
   data := message
 
-  parts := bytes.SplitN(data, []byte{0}, 4)
+  parts := bytes.SplitN(data, []byte{0}, 2)
   if len(parts) < 2 || parts[1] == nil {
     return errors.New("handleFileUpload parts error")
   }

@@ -1,6 +1,6 @@
 'use strict';
 
-const CHUNK_SIZE = 8;
+const CHUNK_SIZE = 1024*1024;
 const FILENAME_LENGTH = 64;
 const EMPTY_CALLBACK = ()=>{};
 
@@ -70,7 +70,7 @@ function hash(file) {
     xorArrays(encoder.encode(""+file.type), encoder.encode(""+file.webkitRelativePath)),
     xorArrays(encoder.encode(""+file.name), encoder.encode(""+file.size))
   );
-  return btoa(preHash).padEnd(64, "0").substring(0,FILENAME_LENGTH);
+  return btoa(preHash).padEnd(FILENAME_LENGTH, "0").substring(0,FILENAME_LENGTH);
 }
 
 export default {
@@ -83,27 +83,30 @@ export default {
   addFile: function(file, callback) {
     const reader = new FileReader();
     const ws = this.ws;
-    const filename = (new TextEncoder()).encode(hash(file) + '\0');
-    const data = new Uint8Array(FILENAME_LENGTH + CHUNK_SIZE);
+    const _hash = hash(file);
+    const filename = (new TextEncoder()).encode(_hash + '\0');
+    const data = new Uint8Array(FILENAME_LENGTH + 1 + CHUNK_SIZE);
     data.set(filename);
     var offset = 0;
     reader.onload = () => {
       const chunk = new Uint8Array(reader.result);
       offset = offset + chunk.length;
       let d = data;
-      console.log(chunk.length, chunk);
+      //console.log(chunk.length, chunk);
       if (chunk.length !== CHUNK_SIZE){
-        d = new Uint8Array(FILENAME_LENGTH + chunk.length);
+        d = new Uint8Array(FILENAME_LENGTH + 1 + chunk.length);
         d.set(filename);
       }
-      d.set(chunk, FILENAME_LENGTH);
+      d.set(chunk, FILENAME_LENGTH + 1);
+      console.log(d);
       if (offset < file.size) {
-        console.log(offset);
-        ws.send(data, EMPTY_CALLBACK);
+        //console.log(offset);
+        ws.send(d, EMPTY_CALLBACK);
         reader.readAsArrayBuffer(file.slice(offset, offset + CHUNK_SIZE));
-      } else { ws.send(data, callback); }
+      } else { ws.send(d, callback); }
     };
     reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
+    this.ws.send(JSON.stringify({C:2,M:_hash}));
     return this;
   },
 };
