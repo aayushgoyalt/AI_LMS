@@ -13,7 +13,7 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "solid-devtools": "^0.29.3",
-    "tailwindcss": "^3.4.3",
+    "tailwindcss": "^3.4.4",
     "vite": "^5.2.12",
     "vite-plugin-singlefile": "^2.0.1",
     "vite-plugin-solid": "^2.10.2"
@@ -22,7 +22,7 @@
     "boxicons": "^2.1.4",
     "solid-js": "^1.8.17",
     "solid-motionone": "^1.0.0",
-    "terser": "^5.31.0",
+    "terser": "^5.31.1",
     "three": "^0.165.0"
   }
 }
