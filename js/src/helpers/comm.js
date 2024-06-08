@@ -85,6 +85,11 @@ export default {
     const ws = this.ws;
     const _hash = hash(file);
     const filename = (new TextEncoder()).encode(_hash + '\0');
+    {
+      const data = new Uint8Array(FILENAME_LENGTH);
+      data.set((new TextEncoder()).encode(_hash));
+      ws.send(data)
+    }
     const data = new Uint8Array(FILENAME_LENGTH + 1 + CHUNK_SIZE);
     data.set(filename);
     var offset = 0;

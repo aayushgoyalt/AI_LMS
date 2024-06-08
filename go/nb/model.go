@@ -3,7 +3,6 @@ package LM
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
@@ -79,7 +78,6 @@ func (model *Model) Ask() (*genai.GenerateContentResponse, error){
 /// add `part` to tokens pool
 func (model *Model) add(part genai.Part) {
   model.Parts = append(model.Parts, part)
-  fmt.Println("ADDING")
 }
 
 /// convert and add a png at `location` to tokens pool

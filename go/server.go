@@ -1,22 +1,23 @@
 package main
 
 import (
-  "bytes"
-  "context"
-  "encoding/json"
-  "errors"
-  "log"
-  "LM/nb"
-  "os"
-  
-  "fmt"
-  "net/http"
-  
-  "github.com/gin-gonic/gin"
-  "github.com/gorilla/websocket"
-  
-  "github.com/google/generative-ai-go/genai"
-  "google.golang.org/api/option"
+	"LM/nb"
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"log"
+	"os"
+	"os/exec"
+
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 )
 
 const route = "127.0.0.1:8080"
@@ -54,10 +55,18 @@ func handleFileUpload(message []byte, dir string) error {
   // }
   // slice_num := binary.BigEndian.Uint32(message)
   // _ = slice_num
-  data := message
 
-  parts := bytes.SplitN(data, []byte{0}, 2)
+  parts := bytes.SplitN(message, []byte{0}, 2)
   if len(parts) < 2 || parts[1] == nil {
+    name := dir+"/"+string(message)
+    fmt.Println(name)
+    os.Remove(name)
+    if (dir != ""){
+      cmd := exec.Command("rm", "-rf", name+"_")
+      cmd.Run();
+      return errors.New("OKAY")
+    }
+    fmt.Println(dir, "VS", os.TempDir())
     return errors.New("handleFileUpload parts error")
   }
 
