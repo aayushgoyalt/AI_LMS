@@ -1,27 +1,17 @@
 package LM
 
 import (
-  "context"
-  "errors"
-  "log"
-  "os"
-  
-  "github.com/google/generative-ai-go/genai"
+	"context"
+	"errors"
+	"fmt"
+	"os"
+
+	"github.com/google/generative-ai-go/genai"
 )
 
 /// Convert text to tokens
 func partsTXT(text string) genai.Part {
   return genai.Text(text)
-}
-
-/// Convert png to tokens
-func partsPNG(location string) (genai.Part, error){
-  part, err := os.ReadFile(location)
-  if err != nil {
-    return nil, err
-    log.Fatal("The file ",location," does not exist")
-  }
-  return genai.ImageData("png", part), nil
 }
 
 /// The LM interface
@@ -89,15 +79,16 @@ func (model *Model) Ask() (*genai.GenerateContentResponse, error){
 /// add `part` to tokens pool
 func (model *Model) add(part genai.Part) {
   model.Parts = append(model.Parts, part)
+  fmt.Println("ADDING")
 }
 
 /// convert and add a png at `location` to tokens pool
 func (model *Model) addPNG(location string) error{
-  part, err := partsPNG(location)
+  file, err := os.ReadFile(location)
   if err != nil {
     return err
   }
-  model.add(part)
+  model.add(genai.ImageData("png", file))
   return nil
 }
 
@@ -108,15 +99,19 @@ func (model *Model) AddTXT(text string) {
 
 /// convert and a file text to tokens pool
 func (model *Model) AddFILE(name string, dir string) error {
-  convert(dir + name)
-  list, err := os.ReadDir(dir+"/")
+  if err := convert(dir +"/"+ name); err != nil {
+    return err
+  }
+  list, err := os.ReadDir(dir+"/"+name+"_")
   if err != nil {
     return errors.New("AddFILE opendir error")
   }
   for _, file := range list {
-    name := file.Name()
-    if !file.IsDir() && name[0] == '-' {
-      model.addPNG(dir+"/"+name)
+    png_name := file.Name()
+    if png_name[0] == '-' {
+      if err := model.addPNG(dir+"/"+name+"_/"+png_name); err != nil {
+	return err
+      }
     }
   }
   return nil

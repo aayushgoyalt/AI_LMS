@@ -108,7 +108,9 @@ func handleTextMessage(message []byte, dir string, model *LM.Model ) error {
     model.AddTXT(req.Message)
     return nil
   case 2: // AddFile
-    model.AddFILE(req.Message, dir);
+    if err:= model.AddFILE(req.Message, dir); err != nil {
+      return err
+    }
     return nil
   default:
     return errors.New("Invalid Command")
@@ -136,7 +138,7 @@ func serve() error{
       defer conn.Close()
 
       model := LM.Model{};
-      err = model.Init("gemini-1.0-pro", client, nil)
+      err = model.Init("gemini-1.5-pro", client, nil)
       if err != nil{
         c.JSON(http.StatusInternalServerError, err.Error())
         return

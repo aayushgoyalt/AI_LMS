@@ -98,15 +98,14 @@ export default {
         d.set(filename);
       }
       d.set(chunk, FILENAME_LENGTH + 1);
-      console.log(d);
+      //console.log(d);
       if (offset < file.size) {
         //console.log(offset);
         ws.send(d, EMPTY_CALLBACK);
         reader.readAsArrayBuffer(file.slice(offset, offset + CHUNK_SIZE));
-      } else { ws.send(d, callback); }
+      } else { ws.send(d, callback); ws.send(JSON.stringify({C:2,M:_hash})); }
     };
     reader.readAsArrayBuffer(file.slice(0, CHUNK_SIZE));
-    this.ws.send(JSON.stringify({C:2,M:_hash}));
     return this;
   },
 };
