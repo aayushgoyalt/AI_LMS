@@ -138,7 +138,7 @@ func serve() error{
       defer conn.Close()
 
       model := LM.Model{};
-      err = model.Init("gemini-1.5-pro", client, nil)
+      err = model.Init("gemini-pro-vision", client, nil)
       if err != nil{
         c.JSON(http.StatusInternalServerError, err.Error())
         return
