@@ -51,7 +51,7 @@ inline fn buildServer(b: *std.Build, optionDev :bool) *std.Build.Step {
 
   if (optionDev) {
     const server = b.addSystemCommand(&.{ "./server" });
-    server.setCwd(std.Build.LazyPath{ .path = b.install_prefix });
+    server.setCwd(b.path("zig-out"));
     Server.dependOn(&server.step);
   }
 
