@@ -1,27 +1,26 @@
 package main
 
 import (
-	"LM/nb"
-	"bytes"
-	"context"
-	"encoding/json"
-	"errors"
-	"log"
-	"os"
-	"os/exec"
-
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-
-	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/option"
+  "LM/nb"
+  "bytes"
+  "context"
+  "encoding/json"
+  "errors"
+  "log"
+  "os"
+  "os/exec"
+  
+  "fmt"
+  "net/http"
+  
+  "github.com/gin-gonic/gin"
+  "github.com/gorilla/websocket"
+  "google.golang.org/api/option"
+  "github.com/google/generative-ai-go/genai"
 )
 
 const route = "127.0.0.1:8080"
-const api_key = "AIzaSyBAyolaqLVrjxNjBq557YyYbjTvxZ1pfdY"
+const api_key = "AIzaSyBeZE4YQMcxI9aGB3hviuLZg83cyVHfvKk"
 
 var upgrader = websocket.Upgrader{
   ReadBufferSize:  1024,
@@ -36,14 +35,14 @@ func handleResp(model *LM.Model) error{
     return err
   }
   if resp == nil || len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil || len(resp.Candidates[0].Content.Parts) == 0{
-    return errors.New("handleResp respose error")
+    return errors.New("handleResp response error")
   } else {
     switch p := resp.Candidates[0].Content.Parts[0].(type) {
     case genai.Text:
       return errors.New(string(p))
     default:
       fmt.Println("Unknown genai.Part type:", p)
-      return errors.New("handleResp unknown respose type error")
+      return errors.New("handleResp unknown response type error")
     }
   }
 }
@@ -147,7 +146,7 @@ func serve() error{
       defer conn.Close()
 
       model := LM.Model{};
-      err = model.Init("gemini-1.5-pro", client, nil)
+      err = model.Init("gemini-1.5-flash", client, nil)
       if err != nil{
         c.JSON(http.StatusInternalServerError, err.Error())
         return
